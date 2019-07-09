@@ -1,10 +1,6 @@
 ---
 # description: FreeBSD specific installation
 
-- name: "FreeBSD | set package name"
-  set_fact:
-    telegraf_agent_package: telegraf
-
 - name: "FreeBSD | Install Telegraf package"
   pkgng:
     name: "{{ telegraf_agent_package }}"

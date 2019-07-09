@@ -6,12 +6,6 @@
   when:
     - telegraf_agent_aws_tags
 
-- name: "Add prefix path"
-  set_fact:
-    telegraf_agent_config_path: /usr/local/etc
-  when:
-    - ansible_os_family == "FreeBSD"
-
 - name: Retrieve all ec2 tags on the instance
   ec2_tag:
     region: '{{ ansible_ec2_placement_region }}'
@@ -25,9 +19,7 @@
   template:
     src: etc-opt-telegraf-telegraf.conf.j2
     dest: /etc/opt/telegraf/telegraf.conf
-    owner: telegraf
-    group: telegraf
-    mode: 0640
+    mode: 0644
   become: yes
   when:
     - telegraf_agent_version is version_compare('0.10.0', '<')
@@ -39,9 +31,7 @@
   template:
     src: telegraf.conf.j2
     dest: "{{ telegraf_agent_config_path }}/telegraf.conf"
-    owner: telegraf
-    group: telegraf
-    mode: 0640
+    mode: 0644
   become: yes
   when:
     - telegraf_agent_version is version_compare('0.10.0', '>=')
@@ -87,9 +77,7 @@
   template:
     src: "telegraf-extra-plugin.conf.j2"
     dest: "{{ telegraf_agent_config_path }}/telegraf.d/{{ item.key }}.conf"
-    owner: telegraf
-    group: telegraf
-    mode: 0640
+    mode: 0644
   with_dict: "{{ telegraf_plugins_extra }}"
   loop_control:
     label: "{{ item.key }}"
@@ -117,14 +105,3 @@
   notify:
     - Restart Telegraf
     - Restart Telegraf container
-
-- name: "Force restart service after reread config"
-  meta: flush_handlers
-
-- name: "Start Telegraf (If it wasn't running)"
-  service:
-    name: telegraf
-    state: started
-    enabled: yes
-  become: yes
-  when: not telegraf_agent_docker

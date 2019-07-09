@@ -30,7 +30,7 @@
   win_template:
     src: telegraf.conf.j2
     dest: '{{ telegraf_win_install_dir }}\telegraf\telegraf.conf'
-  notify: "Restart Windows Telegraf"
+  notify: "Restart Telegraf"
 
 - name: "Windows | Copy telegraf extra plugins"
   win_template:
@@ -43,7 +43,7 @@
     - telegraf_plugins_extra is defined
     - telegraf_plugins_extra is iterable
     - item.value.state|default('present') != 'absent'
-  notify: "Restart Windows Telegraf"
+  notify: "Restart Telegraf"
 
 - name: "Windows | Remove telegraf extra plugins"
   win_file:
@@ -56,7 +56,7 @@
     - telegraf_plugins_extra is defined
     - telegraf_plugins_extra is iterable
     - item.value.state|default('present') == 'absent'
-  notify: "Restart Windows Telegraf"
+  notify: "Restart Telegraf"
 
 - name: "Windows | Register Service"
   win_command: '{{ telegraf_win_install_dir }}\telegraf\telegraf.exe {{ telegraf_win_service_args | join(" ") }}'
@@ -75,4 +75,4 @@
   win_service:
     name: Telegraf
     start_mode: auto
-    state: started
+    state: restarted

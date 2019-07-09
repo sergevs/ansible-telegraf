@@ -1,0 +1,23 @@
+---
+# description: MacOS specific installation
+
+- name: Check homebrew installed
+  command: /usr/local/bin/brew --version
+  register: brew_version
+  failed_when: false
+  changed_when: false
+
+- name: Install homebrew
+  shell: /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+  when: not ansible_check_mode and brew_version.rc != 0
+
+- name: Update homebrew
+  homebrew:
+    update_homebrew: yes
+  when: not ansible_check_mode
+
+- name: Install packages
+  homebrew:
+    name: "{{ telegraf_agent_package }}"
+    state: present
+  when: not ansible_check_mode
